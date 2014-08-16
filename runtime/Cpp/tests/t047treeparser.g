@@ -22,6 +22,7 @@ tokens {
 
 @parser::includes {
 #include "UserTestTraits.hpp"
+#include "t047treeparserLexer.hpp"
 }
 @parser::namespace
 { Antlr3Test }
@@ -81,7 +82,7 @@ forStat
     ;
 
 assignStat
-    :   ID EQ expr -> ^(EQ ID expr)
+    :   ID T_EQ expr -> ^(T_EQ ID expr)
     ;
 
 expr:   condExpr
@@ -112,15 +113,15 @@ ID  :   ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
 INT :	('0'..'9')+
     ;
 
-EQ   : '=' ;
-EQEQ : '==' ;
-LT   : '<' ;
-PLUS : '+' ;
+T_EQ   : '=' ;
+T_EQEQ : '==' ;
+T_LT   : '<' ;
+T_PLUS : '+' ;
 
 WS  :   (   ' '
         |   '\t'
         |   '\r'
         |   '\n'
         )+
-        { $channel=HIDDEN }
+        { $channel=HIDDEN; }
     ;    

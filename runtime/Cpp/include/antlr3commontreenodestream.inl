@@ -3,7 +3,14 @@ namespace antlr3 {
 template<class ImplTraits>
 CommonTreeNodeStream<ImplTraits>::CommonTreeNodeStream(ANTLR_UINT32 hint)
 {
-	this->init(hint);
+	init(hint);
+}
+
+template<class ImplTraits>
+CommonTreeNodeStream<ImplTraits>::CommonTreeNodeStream( TreeTypePtr& tree, ANTLR_UINT32 hint )
+{
+	init(hint);
+	m_root = tree.get();
 }
 
 template<class ImplTraits>
@@ -13,13 +20,11 @@ void CommonTreeNodeStream<ImplTraits>::init( ANTLR_UINT32 hint )
 	m_adaptor = new TreeAdaptorType;
 	// Create the node list map
 	//
-	if	(hint == 0)
+	if (hint == 0)
 		hint = DEFAULT_INITIAL_BUFFER_SIZE;
 	m_nodes.reserve( DEFAULT_INITIAL_BUFFER_SIZE );
 
 	m_p = -1;
-	m_currentNode = NULL;
-	m_previousNode = NULL;
 	m_currentChildIndex = 0; 
 	m_absoluteNodeIndex = 0;
 	m_lookAhead = NULL;
@@ -29,21 +34,10 @@ void CommonTreeNodeStream<ImplTraits>::init( ANTLR_UINT32 hint )
 	m_uniqueNavigationNodes = false;
 	m_isRewriter = false;
 
-	CommonTokenType* token		= new CommonTokenType(CommonTokenType::TOKEN_UP);
-	token->set_tokText( "UP" );
-	m_UP.set_token( token );
-
-	token		= new CommonTokenType(CommonTokenType::TOKEN_DOWN);
-	token->set_tokText( "DOWN" );
-	m_DOWN.set_token( token );
-
-	token		= new CommonTokenType(CommonTokenType::TOKEN_EOF);
-	token->set_tokText( "EOF" );
-	m_EOF_NODE.set_token( token );
-
-	token		= new CommonTokenType(CommonTokenType::TOKEN_INVALID);
-	token->set_tokText( "INVALID" );
-	m_EOF_NODE.set_token( token );
+	m_UP = m_adaptor->create(CommonTokenType::TOKEN_UP, "UP");
+	m_DOWN = m_adaptor->create(CommonTokenType::TOKEN_DOWN, "DOWN");
+	m_EOF_NODE = m_adaptor->create(CommonTokenType::TOKEN_EOF, "EOF");
+	m_INVALID_NODE = m_adaptor->create(CommonTokenType::TOKEN_INVALID, "INVALID");
 }
 
 template<class ImplTraits>
@@ -65,70 +59,45 @@ CommonTreeNodeStream<ImplTraits>::CommonTreeNodeStream( const CommonTreeNodeStre
 	m_uniqueNavigationNodes = false;
 	m_isRewriter = true;
 
-	m_UP.set_token( ctn.m_UP.get_token() );
-	m_DOWN.set_token( ctn.m_DOWN.get_token() );
-	m_EOF_NODE.set_token( ctn.m_EOF_NODE.get_token() );
-	m_INVALID_NODE.set_token( ctn.m_INVALID_NODE.get_token() );
-}
-
-template<class ImplTraits>
-CommonTreeNodeStream<ImplTraits>::CommonTreeNodeStream( TreeTypePtr tree, ANTLR_UINT32 hint )
-{
-	this->init(hint);
-	m_root = tree;
+	m_UP = m_adaptor->create(CommonTokenType::TOKEN_UP, "UP");
+	m_DOWN = m_adaptor->create(CommonTokenType::TOKEN_DOWN, "DOWN");
+	m_EOF_NODE = m_adaptor->create(CommonTokenType::TOKEN_EOF, "EOF");
+	m_INVALID_NODE = m_adaptor->create(CommonTokenType::TOKEN_INVALID, "INVALID");
 }
 
 template<class ImplTraits>
 CommonTreeNodeStream<ImplTraits>::~CommonTreeNodeStream()
 {
-	// If this is a rewrting stream, then certain resources
+	// If this is a rewriting stream, then certain resources
 	// belong to the originating node stream and we do not
 	// free them here.
 	//
 	if	( m_isRewriter != true)
 	{
-		delete m_adaptor;
-
 		m_nodeStack.clear();
-
-		delete m_INVALID_NODE.get_token();
-		delete m_EOF_NODE.get_token();
-		delete m_DOWN.get_token();
-		delete m_UP.get_token();
 	}
 	
 	m_nodes.clear();
 }
 
 template<class ImplTraits>
-typename CommonTreeNodeStream<ImplTraits>::TreeTypePtr	CommonTreeNodeStream<ImplTraits>::_LT(ANTLR_INT32 k)
+bool
+CommonTreeNodeStream<ImplTraits>::isEOF(ElementType o)
 {
-	if	( m_p == -1)
-	{
-		this->fillBufferRoot();
-	}
-
-	if	(k < 0)
-	{
-		return this->LB(-k);
-	}
-	else if	(k == 0)
-	{
-		return	&(m_INVALID_NODE);
-	}
-
-	// k was a legitimate request, 
-	//
-	if	(( m_p + k - 1) >= (ANTLR_INT32)(m_nodes.size()))
-	{
-		return &(m_EOF_NODE);
-	}
-
-	return	m_nodes[ m_p + k - 1 ];
+	return m_adaptor->getType(o) == CommonTokenType::TOKEN_EOF;
 }
 
 template<class ImplTraits>
-typename CommonTreeNodeStream<ImplTraits>::TreeTypePtr	CommonTreeNodeStream<ImplTraits>::getTreeSource()
+ANTLR_UINT32
+CommonTreeNodeStream<ImplTraits>::LA(ANTLR_INT32 i)
+{
+	TreeType* token = LT(i);
+	return m_adaptor->getType(token);
+	//return m_adaptor->getType(LT(i));
+}
+
+template<class ImplTraits>
+typename CommonTreeNodeStream<ImplTraits>::TreeType*	CommonTreeNodeStream<ImplTraits>::getTreeSource()
 {
 	return m_root;
 }
@@ -140,39 +109,40 @@ typename CommonTreeNodeStream<ImplTraits>::TreeAdaptorType*	CommonTreeNodeStream
 }
 
 template<class ImplTraits>
-void  CommonTreeNodeStream<ImplTraits>::set_uniqueNavigationNodes(bool uniqueNavigationNodes)
+void  CommonTreeNodeStream<ImplTraits>::setUniqueNavigationNodes(bool uniqueNavigationNodes)
 {
 	m_uniqueNavigationNodes = uniqueNavigationNodes;
 }
 
 template<class ImplTraits>
-typename CommonTreeNodeStream<ImplTraits>::StringType  CommonTreeNodeStream<ImplTraits>::toString()
+typename CommonTreeNodeStream<ImplTraits>::StringType CommonTreeNodeStream<ImplTraits>::toString()
 {
-    return  this->toStringSS(m_root, NULL);
+	return toString(m_root, NULL);
 }
 
 template<class ImplTraits>
-typename CommonTreeNodeStream<ImplTraits>::StringType  CommonTreeNodeStream<ImplTraits>::toStringSS(TreeTypePtr start, TreeTypePtr stop)
+typename CommonTreeNodeStream<ImplTraits>::StringType CommonTreeNodeStream<ImplTraits>::toString(TreeType* start, TreeType* stop)
 {
-	StringType  buf;
-    this->toStringWork(start, stop, buf);
-    return  buf;
-}
-
-template<class ImplTraits>
-void CommonTreeNodeStream<ImplTraits>::toStringWork(TreeTypePtr start, TreeTypePtr stop, StringType& str)
-{
-	ANTLR_UINT32   n;
-	ANTLR_UINT32   c;
 	StringStreamType buf;
+	toStringImpl(start, stop, buf);
+	return buf.str();
+}
 
-	if	(!start->isNilNode() )
+template<class ImplTraits>
+typename CommonTreeNodeStream<ImplTraits>::StringType CommonTreeNodeStream<ImplTraits>::toString(TreeTypePtr& start, TreeTypePtr& stop)
+{
+	StringStreamType buf;
+	toStringImpl(start, stop, buf);
+	return buf.str();
+}
+
+template<class ImplTraits>
+void CommonTreeNodeStream<ImplTraits>::toStringImpl(TreeTypePtr& start, TreeTypePtr& stop, StringStreamType &buf)
+{
+	if (!start->isNilNode() )
 	{
-		StringType	text;
-
-		text	= start->toString();
-
-		if  (text.empty())
+		StringType text = start->toString();
+		if (text.empty())
 		{
 			buf << ' ';
 			buf << start->getType();
@@ -181,134 +151,74 @@ void CommonTreeNodeStream<ImplTraits>::toStringWork(TreeTypePtr start, TreeTypeP
 			buf << text;
 	}
 
-	if	(start == stop)
+	if (start == stop)
 	{
-		return;		/* Finished */
+		return; /* Finished */
 	}
 
-	n = start->getChildCount();
+	auto &children = start->get_children();
 
-	if	(n > 0 && ! start->isNilNode() )
+	if (!children.empty() && !start->isNilNode())
 	{
 		buf << ' ';
 		buf << CommonTokenType::TOKEN_DOWN;
 	}
 
-	for	(c = 0; c<n ; c++)
+	for (auto &child: start->get_children())
 	{
-		TreeTypePtr   child;
-
-		child = start->getChild(c);
-		this->toStringWork(child, stop, buf);
+		this->toStringImpl(child, stop, buf);
 	}
 
-	if	(n > 0 && ! start->isNilNode() )
+	if (!children.empty() && ! start->isNilNode() )
 	{
 		buf << ' ';
 		buf << CommonTokenType::TOKEN_UP;
 	}
-	str = buf.str();
 }
 
 template<class ImplTraits>
-typename  CommonTreeNodeStream<ImplTraits>::TreeTypePtr	CommonTreeNodeStream<ImplTraits>::get(ANTLR_INT32 k)
+void CommonTreeNodeStream<ImplTraits>::replaceChildren(TreeTypePtr& parent, ANTLR_INT32 startChildIndex, ANTLR_INT32 stopChildIndex, TreeTypePtr& t)
 {
-	if( m_p == -1 )
+	if (parent != NULL)
 	{
-		this->fillBufferRoot();
-	}
-
-	return m_nodes[k];
-}
-
-template<class ImplTraits>
-void	CommonTreeNodeStream<ImplTraits>::replaceChildren(TreeTypePtr parent, 
-															ANTLR_INT32 startChildIndex, 
-															ANTLR_INT32 stopChildIndex, 
-															TreeTypePtr t)
-{
-	if	(parent != NULL)
-	{
-		TreeAdaptorType*	adaptor;
-		adaptor	= this->getTreeAdaptor();
+		TreeAdaptorType* adaptor = this->getTreeAdaptor();
 		adaptor->replaceChildren(parent, startChildIndex, stopChildIndex, t);
 	}
 }
 
 template<class ImplTraits>
-typename CommonTreeNodeStream<ImplTraits>::TreeTypePtr CommonTreeNodeStream<ImplTraits>::LB(ANTLR_INT32 k)
-{
-	if	( k==0)
-	{
-		return	&(m_INVALID_NODE);
-	}
-
-	if	( (m_p - k) < 0)
-	{
-		return	&(m_INVALID_NODE);
-	}
-
-	return m_nodes[ m_p - k ];
-}
-
-template<class ImplTraits>
 void CommonTreeNodeStream<ImplTraits>::addNavigationNode(ANTLR_UINT32 ttype)
 {
-	TreeTypePtr	    node;
-
-	node = NULL;
-
-	if	(ttype == CommonTokenType::TOKEN_DOWN)
+	if (ttype == CommonTokenType::TOKEN_DOWN)
 	{
-		if  (this->hasUniqueNavigationNodes() == true)
+		if (this->hasUniqueNavigationNodes() == true)
 		{
-			node    = this->newDownNode();
-		}
-		else
-		{
-			node    = &m_DOWN;
+		// 	m_nodes.push_back( this->newDownNode() );
+		} else {
+			m_nodes.push_back( m_DOWN );
 		}
 	}
 	else
 	{
-		if  (this->hasUniqueNavigationNodes() == true)
+		if (this->hasUniqueNavigationNodes() == true)
 		{
-			node    = this->newUpNode();
-		}
-		else
-		{
-			node    = &m_UP;
+		// 	m_nodes.push_back( this->newUpNode() );
+		} else {
+			m_nodes.push_back( m_UP );
 		}
 	}
-
-	// Now add the node we decided upon.
-	//
-	m_nodes.push_back(node);
 }
 
 template<class ImplTraits>
 typename CommonTreeNodeStream<ImplTraits>::TreeTypePtr	CommonTreeNodeStream<ImplTraits>::newDownNode()
 {
-	TreeTypePtr	    dNode;
-    CommonTokenType*    token;
-
-    token					= new CommonTokenType(CommonTokenType::TOKEN_DOWN);
-	token->set_tokText("DOWN");
-    dNode					= new TreeType(token);
-    return  &dNode;
+	return m_adaptor->create(CommonTokenType::TOKEN_DOWN, "DOWN");
 }
 
 template<class ImplTraits>
 typename CommonTreeNodeStream<ImplTraits>::TreeTypePtr	CommonTreeNodeStream<ImplTraits>::newUpNode()
 {
-	TreeTypePtr	    uNode;
-    CommonTokenType*    token;
-
-    token					= new CommonTokenType(CommonTokenType::TOKEN_UP);
-	token->set_tokText("UP");
-    uNode					= new TreeType(token);
-    return  &uNode;
-
+	return m_adaptor->create(CommonTokenType::TOKEN_UP, "UP");	
 }
 
 template<class ImplTraits>
@@ -329,94 +239,91 @@ template<class ImplTraits>
 void	CommonTreeNodeStream<ImplTraits>::push(ANTLR_INT32 index)
 {
 	m_nodeStack.push(m_p);	// Save current index
-	this->seek(index);
+	seek(index);
 }
 
 template<class ImplTraits>
 ANTLR_INT32	CommonTreeNodeStream<ImplTraits>::pop()
 {
-	ANTLR_INT32	retVal;
-
-	retVal = m_nodeStack.top();
+	ANTLR_INT32 retVal = m_nodeStack.top();
 	m_nodeStack.pop();
-	this->seek(retVal);
+	seek(retVal);
 	return retVal;
 }
 
 template<class ImplTraits>
-void	CommonTreeNodeStream<ImplTraits>::reset()
+void
+CommonTreeNodeStream<ImplTraits>::reset()
 {
-	if	( m_p != -1)
-	{
-		m_p	= 0;
-	}
-	BaseType::m_lastMarker		= 0;
+	BaseType::reset();
 
+	//it.reset();
+    //hasNilRoot = false;
+	//level = 0;
+	//previousLocationElement = null;
 
-	// Free and reset the node stack only if this is not
-	// a rewriter, which is going to reuse the originating
-	// node streams node stack
-	//
-	if  (m_isRewriter != true)
-		m_nodeStack.clear();
+	m_nodeStack.clear();
 }
 
 template<class ImplTraits>
-void CommonTreeNodeStream<ImplTraits>::fillBufferRoot()
+void
+CommonTreeNodeStream<ImplTraits>::syncAhead(int need)
+{
+	fillBufferRoot();
+}
+
+template<class ImplTraits>
+void
+CommonTreeNodeStream<ImplTraits>::fillBufferRoot()
 {
 	// Call the generic buffer routine with the root as the
 	// argument
 	//
 	this->fillBuffer(m_root);
-	m_p = 0;					// Indicate we are at buffer start
+	m_p = 0; // Indicate we are at buffer start
 }
 
 template<class ImplTraits>
-void CommonTreeNodeStream<ImplTraits>::fillBuffer(TreeTypePtr t)
+void
+CommonTreeNodeStream<ImplTraits>::fillBuffer(TreeType* t)
 {
-	bool	nilNode;
-	ANTLR_UINT32	nCount;
-	ANTLR_UINT32	c;
-
-	nilNode = m_adaptor->isNilNode(t);
+	bool nilNode = m_adaptor->isNilNode(t);
 
 	// If the supplied node is not a nil (list) node then we
 	// add in the node itself to the vector
 	//
-	if	(nilNode == false)
+	if (nilNode == false)
 	{
-		m_nodes.push_back(t);	
+		m_nodes.push_back(t);
 	}
 
 	// Only add a DOWN node if the tree is not a nil tree and
 	// the tree does have children.
 	//
-	nCount = t->getChildCount();
+	auto &children = t->get_children();
 
-	if	(nilNode == false && nCount>0)
+	if (nilNode == false && !children.empty())
 	{
-		this->addNavigationNode( CommonTokenType::TOKEN_DOWN);
+		addNavigationNode( CommonTokenType::TOKEN_DOWN);
 	}
 
 	// We always add any children the tree contains, which is
 	// a recursive call to this function, which will cause similar
 	// recursion and implement a depth first addition
 	//
-	for	(c = 0; c < nCount; c++)
+	for (auto &child: children)
 	{
-		this->fillBuffer( m_adaptor->getChild(t, c));
+		this->fillBuffer(child.get());
 	}
 
 	// If the tree had children and was not a nil (list) node, then we
 	// we need to add an UP node here to match the DOWN node
 	//
-	if	(nilNode == false && nCount > 0)
+	if (nilNode == false && !children.empty())
 	{
-		this->addNavigationNode(CommonTokenType::TOKEN_UP);
+		addNavigationNode(CommonTokenType::TOKEN_UP);
 	}
 }
-
-
 
 }
 

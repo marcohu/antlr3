@@ -375,22 +375,85 @@ template<class ImplTraits>
 class TreeNodeIntStream : public IntStream<ImplTraits, typename ImplTraits::TreeNodeStreamType>
 {
 public:
+	typedef typename ImplTraits::TreeNodeStreamType SuperType;
 	typedef typename ImplTraits::TreeNodeStreamType TreeNodeStreamType;
-	typedef IntStream<ImplTraits, TreeNodeStreamType > BaseType;
 	typedef typename ImplTraits::TreeType TreeType;
 	typedef typename ImplTraits::TreeTypePtr TreeTypePtr;
 	typedef typename ImplTraits::CommonTokenType CommonTokenType;
+	typedef typename ImplTraits::AllocPolicyType AllocPolicyType;
+	typedef typename AllocPolicyType::template VectorType<TreeType*> NodesType;
+	typedef typename NodesType::value_type ElementType;
 
-public:
-	void				consume();
-	ANTLR_MARKER		tindex();
-	ANTLR_UINT32		_LA(ANTLR_INT32 i);
-	ANTLR_MARKER		mark();
-	void				release(ANTLR_MARKER marker);
-	void				rewindMark(ANTLR_MARKER marker);
-	void				rewindLast();
-	void				seek(ANTLR_MARKER index);
-	ANTLR_UINT32		size();
+	/// LookAheadStream Interface functions
+	void consume();
+	TreeType* LT(ANTLR_INT32 i);
+	TreeType* LB(ANTLR_INT32 i);
+	void seek(ANTLR_MARKER index);
+	ANTLR_MARKER mark();
+	ANTLR_MARKER index() const;
+	void release(ANTLR_MARKER marker);
+	void rewindMark(ANTLR_MARKER marker);
+	void rewindLast();
+	void reset();
+protected:
+    void syncAhead(int need);
+    void fillBufferRoot();
+    void fillBuffer(TreeType* t);
+
+protected:
+	/// FastQueue API (wrapper for NodesType)
+	//
+	void clear();          // LookAheadStream::reset, TreeIterator::reset TreeIterator::next LookAheadStream::remove
+	ElementType remove();  // LookAheadStream::remove TreeIterator::next
+	void add(ElementType); // TreeIterator::next
+	ElementType head();
+	ElementType elementAt(); //LookAheadStream::LT LookAheadStream::remove
+
+	typename NodesType::reference get(ANTLR_INT32 i); /* "v*rtual method */
+	typename NodesType::size_type size() const;
+
+	/// The current index into the nodes vector of the current tree
+	/// we are parsing and possibly rewriting.
+	///
+	ANTLR_INT32 m_p; // FastQueue - index of next element to fill
+
+	/// Which node are we currently visiting?
+	///
+	TreeType m_currentNode;
+
+	/// Which node did we last visit? Used for LT(-1)
+	///
+	TreeType m_previousNode;
+
+	/** Dummy tree node that indicates the termination point of the
+	 * tree. Initialized by a call to create a new interface.
+	 **/
+	TreeType *m_EOF_NODE;
+
+	/** Dummy node that is returned if we need to indicate an invalid node
+	 * for any reason.
+	 **/
+	TreeType *m_INVALID_NODE;
+
+	/// The complete mapping from stream index to tree node.
+	/// This buffer includes pointers to DOWN, UP, and EOF nodes.
+	/// It is built upon ctor invocation.  The elements are type
+	/// Object as we don't what the trees look like.
+	///
+	/// Load upon first need of the buffer so we can set token types
+	/// of interest for reverseIndexing.  Slows us down a wee bit to
+	/// do all of the if p==-1 testing everywhere though, though in C
+	/// you won't really be able to measure this.
+	///
+	NodesType m_nodes;
+
+private:
+	SuperType* get_super();
+	SuperType const* get_super() const;
+
+    /// Last marker position allocated
+    ///
+    ANTLR_MARKER m_lastMarker;
 };
 
 }

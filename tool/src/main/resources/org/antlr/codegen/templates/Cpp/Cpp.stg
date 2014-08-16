@@ -2304,7 +2304,7 @@ public:
         : BaseType()
         <if(scope)>, <scope.attributes:{it | <it.name>() }; separator=","><endif>
         {}
-    <ruleDescriptor:returnStructName()>( BaseParserType* parser )
+    <ruleDescriptor:returnStructName()>( <componentBaseType()>* parser )
         : BaseType(parser)
         <if(scope)>, <scope.attributes:{it | <it.name>() }; separator=","><endif>
         {}
@@ -2333,22 +2333,28 @@ public:
 struct <ruleDescriptor:returnStructName()>
 {
 public:
-    <name>ImplTraits::<recognizer.ASTLabelType>       start;
-    <name>ImplTraits::<recognizer.ASTLabelType>       stop;
-    <ruleDescriptor:returnStructName()>( const <ruleDescriptor:returnStructName()>& other )
+    <recognizer.ASTLabelType>       start;
+    <recognizer.ASTLabelType>       stop;
+	<ruleDescriptor:returnStructName()>()
+	{
+	}
+	<ruleDescriptor:returnStructName()>( <componentBaseType()>* parser)
+	{
+	}
+    <ruleDescriptor:returnStructName()>( <ruleDescriptor:returnStructName()>&& other )
     <if(scope.attributes)>
     <scope.attributes:{it | <it.name>(other.<it.name>) }; separator=",">
     <endif>
     {
-     	start = other.start;
-     	stop  = other.stop;
+     	start = std::move(other.start);
+     	stop  = std::move(other.stop);
     }
     
     <ruleDescriptor:returnStructName()>&
-    operator=( const <ruleDescriptor:returnStructName()>& other )
+    operator=( <ruleDescriptor:returnStructName()>&& other )
     {
-     	start = other.start;
-     	stop  = other.stop;
+     	start = std::move(other.start);
+     	stop  = std::move(other.stop);
 
     	<scope.attributes:{it | <it.name> = other.<it.name>; }; separator="\n">
     	return *this;
@@ -2452,7 +2458,7 @@ ruleLabelPropertyRef_stop(scope,attr) ::= "(<scope>.stop)"
 ruleLabelPropertyRef_tree(scope,attr) ::= "(<scope>.tree)"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-(this->get_strstream()->toStringSS(<scope>.start, <scope>.start))
+(this->get_strstream()->toString(<scope>.start, <scope>.start))
 <else>
 (this->get_strstream()->toStringTT(<scope>.start, <scope>.stop))
 <endif>

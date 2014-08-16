@@ -40,57 +40,78 @@ template<class ImplTraits>
 class  TreeParser : public ImplTraits::template RecognizerType< typename ImplTraits::TreeNodeStreamType >
 {
 public:
+	typedef typename ImplTraits::template RecognizerType< typename ImplTraits::TreeNodeStreamType > BaseType;
+	typedef typename ImplTraits::template RecognizerType< typename ImplTraits::TreeNodeStreamType > RecognizerType;
+
 	typedef typename ImplTraits::TreeNodeStreamType TreeNodeStreamType;
+ 	typedef typename ImplTraits::TreeNodeStreamType TokenStreamType;
 	typedef TreeNodeStreamType StreamType;
-	typedef typename TreeNodeStreamType::IntStreamType IntStreamType;
+	typedef TreeNodeStreamType IntStreamType;
 	typedef typename ImplTraits::TreeType TreeType;
 	typedef typename ImplTraits::TreeTypePtr TreeTypePtr;
 	typedef TreeType TokenType;
 	typedef typename ImplTraits::template ExceptionBaseType<TreeNodeStreamType> ExceptionBaseType;
-	typedef typename ImplTraits::template RecognizerType< typename ImplTraits::TreeNodeStreamType > RecognizerType;
 	typedef typename RecognizerType::RecognizerSharedStateType RecognizerSharedStateType;
 	typedef Empty TokenSourceType;
 	typedef typename ImplTraits::BitsetListType BitsetListType;
 	typedef typename ImplTraits::StringType StringType;
 	typedef typename ImplTraits::CommonTokenType CommonTokenType;
-
+	
 private:
-    /** Pointer to the common tree node stream for the parser
-     */
-    TreeNodeStreamType*		m_ctnstream;
+	/** Pointer to the common tree node stream for the parser
+	 */
+	TreeNodeStreamType* m_ctnstream;
 
 public:
 	TreeParser( ANTLR_UINT32 sizeHint, TreeNodeStreamType* ctnstream,
 											RecognizerSharedStateType* state);
 	TreeNodeStreamType* get_ctnstream() const;
 	IntStreamType* get_istream() const;
+
 	RecognizerType* get_rec();
+	RecognizerType const* get_rec() const;
 
 	//same as above. Just that get_istream exists for lexer, parser, treeparser
 	//get_parser_istream exists only for parser, treeparser. So use it accordingly
 	IntStreamType* get_parser_istream() const;
 
-    /** Set the input stream and reset the parser
-     */
-    void	setTreeNodeStream(TreeNodeStreamType* input);
-
-    /** Return a pointer to the input stream
-     */
-    TreeNodeStreamType* getTreeNodeStream();
-
-	TokenType*	getMissingSymbol( IntStreamType* istream,
-										  ExceptionBaseType*		e,
-										  ANTLR_UINT32			expectedTokenType,
-										  BitsetListType*	follow);
-
-    /** Pointer to a function that knows how to free resources of an ANTLR3 tree parser.
-     */
+	/** Set the input stream and reset the parser
+	 */
+	void setTreeNodeStream(TreeNodeStreamType* input);
+	
+	/** Return a pointer to the input stream
+	 */
+	TreeNodeStreamType* getTreeNodeStream();
+	
+	TokenType* getMissingSymbol( IntStreamType* istream,
+				     ExceptionBaseType* e,
+				     ANTLR_UINT32 expectedTokenType,
+				     BitsetListType* follow);
+	
+	/** Pointer to a function that knows how to free resources of an ANTLR3 tree parser.
+	 */
 	~TreeParser();
 
 	void fillExceptionData( ExceptionBaseType* ex );
 	void displayRecognitionError( ANTLR_UINT8** tokenNames, ExceptionBaseType* ex );
 	void exConstruct();
 	void mismatch(ANTLR_UINT32 ttype, BitsetListType* follow);
+	
+	bool hasException() const;
+
+	const CommonTokenType* matchToken( ANTLR_UINT32 ttype, BitsetListType* follow );
+	void matchAnyToken();
+
+	RecognizerSharedStateType* get_psrstate() const;
+	void consume();
+	void followPush( const BitsetListType& follow );
+	void followPop();
+	void precover();
+	void preporterror();
+	ANTLR_UINT32 LA(ANTLR_INT32 i);
+	void set_perror_recovery( bool val );
+
+	TokenStreamType* get_strstream() const;
 };
 
 }

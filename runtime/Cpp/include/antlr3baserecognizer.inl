@@ -609,18 +609,18 @@ template< class ImplTraits, class StreamType >
 void	BaseRecognizer<ImplTraits, StreamType>::consumeUntil(ANTLR_UINT32   tokenType)
 {
 	SuperType* super = static_cast<SuperType*>(this);
-	IntStreamType* is = super->get_parser_istream();
+	auto is = super->get_parser_istream();
 
 	// What do have at the moment?
     //
-    ANTLR_UINT32 ttype	= is->_LA(1);
+    ANTLR_UINT32 ttype	= is->LA(1);
 
     // Start eating tokens until we get to the one we want.
     //
     while   (ttype != ImplTraits::CommonTokenType::TOKEN_EOF && ttype != tokenType)
     {
 		is->consume();
-		ttype	= is->_LA(1);
+		ttype	= is->LA(1);
     }
 }
 
@@ -629,18 +629,18 @@ void	BaseRecognizer<ImplTraits, StreamType>::consumeUntilSet(BitsetType*	set)
 {
     ANTLR_UINT32	    ttype;
 	SuperType* super = static_cast<SuperType*>(this);
-	IntStreamType* is = super->get_parser_istream();
+	auto is = super->get_parser_istream();
 
     // What do have at the moment?
     //
-    ttype	= is->_LA(1);
+    ttype = is->LA(1);
 
     // Start eating tokens until we get to one we want.
     //
     while   (ttype != ImplTraits::CommonTokenType::TOKEN_EOF && set->isMember(ttype) == false)
     {
 		is->consume();
-		ttype	= is->_LA(1);
+		ttype = is->LA(1);
     }
 
 }

@@ -391,13 +391,21 @@ ANTLR_UINT32	CommonTreeAdaptor<ImplTraits>::getType( TreeTypePtr& t)
 }
 
 template<class ImplTraits>
-typename CommonTreeAdaptor<ImplTraits>::StringType	CommonTreeAdaptor<ImplTraits>::getText( TreeTypePtr& t)
+ANTLR_UINT32	CommonTreeAdaptor<ImplTraits>::getType( TreeType* t)
+{
+	if ( t==NULL)
+		return CommonTokenType::TOKEN_INVALID;
+	return t->getType();
+}
+
+template<class ImplTraits>
+typename CommonTreeAdaptor<ImplTraits>::StringType CommonTreeAdaptor<ImplTraits>::getText( TreeTypePtr& t)
 {
 	return t->getText();
 }
 
 template<class ImplTraits>
-typename CommonTreeAdaptor<ImplTraits>::TreeTypePtr&	    CommonTreeAdaptor<ImplTraits>::getChild( TreeTypePtr& t, ANTLR_UINT32 i)
+typename CommonTreeAdaptor<ImplTraits>::TreeTypePtr& CommonTreeAdaptor<ImplTraits>::getChild( TreeTypePtr& t, ANTLR_UINT32 i)
 {
 	if ( t==NULL )
 		return NULL;

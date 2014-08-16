@@ -117,8 +117,11 @@ s006:   s006.cpp SQLMini2.tokens UserTestTraits.hpp Makefile $(ANTLR) $(RUNTIME_
 
 # AST commented out
 #
-# t042:	t042.cpp t005lexer.tokens UserTestTraits.hpp Makefile $(ANTLR) $(RUNTIME_HEADERS)
+# t042:	t042.cpp t042lexer.tokens UserTestTraits.hpp Makefile $(ANTLR) $(RUNTIME_HEADERS)
 # 	$(CXX) $(CFLAGS) $(INCLUDES) $< $(wildcard $@?*.cpp) -o $@
+
+t047:	t047.cpp t047treeparser.tokens t047treeparserWalker.tokens UserTestTraits.hpp Makefile $(ANTLR) $(RUNTIME_HEADERS)
+	$(CXX) $(CFLAGS) $(INCLUDES) $< $(wildcard $@?*.cpp) -o $@
 
 clean:
 	rm -f *.o [ast]0[0-9][0-9]??*.[ch]pp *.tokens [ast][0-9][0-9][0-9] [ast]0[0-9][0-9].exe

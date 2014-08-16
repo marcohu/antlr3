@@ -137,6 +137,7 @@ public:
 
 	TreeTypePtr	errorNode( CommonTokenType* tnstream, const CommonTokenType* startToken, const CommonTokenType* stopToken);
 	bool	isNilNode( TreeTypePtr& t);
+  	bool	isNilNode( TreeType* t);
 
 	TreeTypePtr	becomeRoot( TreeTypePtr& newRoot, TreeTypePtr& oldRoot);
 	TreeTypePtr	becomeRoot( TreeTypePtr&& newRoot, TreeTypePtr& oldRoot);
@@ -153,6 +154,7 @@ public:
 	CommonTokenType* createToken( const CommonTokenType* fromToken);
 
 	ANTLR_UINT32	getType( TreeTypePtr& t);
+	ANTLR_UINT32	getType( TreeType* t);
 	StringType	getText( TreeTypePtr& t);
         
 	TreeTypePtr&	getChild( TreeTypePtr& t, ANTLR_UINT32 i);

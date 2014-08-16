@@ -54,6 +54,15 @@ void CommonTree<ImplTraits>::set_token(typename CommonTree<ImplTraits>::CommonTo
 }
 
 template<class ImplTraits>
+ANTLR_UINT32 CommonTree<ImplTraits>::get_type() const
+{
+	if ( m_token )
+		return m_token->get_type();
+	else
+		return CommonTokenType::TOKEN_INVALID;
+}
+
+template<class ImplTraits>
 typename CommonTree<ImplTraits>::ChildrenType& CommonTree<ImplTraits>::get_children()
 {
 	return m_children;
@@ -373,7 +382,7 @@ typename CommonTree<ImplTraits>::StringType	CommonTree<ImplTraits>::getText()
 }
 
 template<class ImplTraits>
-bool CommonTree<ImplTraits>::isNilNode()
+bool CommonTree<ImplTraits>::isNilNode() const
 {
 	// This is a Nil tree if it has no payload (Token in our case)
 	if(m_token == NULL)
@@ -403,7 +412,7 @@ void CommonTree<ImplTraits>::setChild(ANTLR_UINT32 i, TreeTypePtr child)
 }
 
 template<class ImplTraits>
-typename CommonTree<ImplTraits>::StringType	CommonTree<ImplTraits>::toStringTree()
+typename CommonTree<ImplTraits>::StringType	CommonTree<ImplTraits>::toStringTree() const
 {
 	StringType retval;
 
@@ -412,7 +421,7 @@ typename CommonTree<ImplTraits>::StringType	CommonTree<ImplTraits>::toStringTree
 
 	/* Need a new string with nothing at all in it.
 	*/
-	if(this->isNilNode() == false)
+	if(isNilNode() == false)
 	{
 		retval.append("(");
 		retval.append(this->toString());
@@ -429,7 +438,7 @@ typename CommonTree<ImplTraits>::StringType	CommonTree<ImplTraits>::toStringTree
 		}
 	}
 
-	if	(this->isNilNode() == false)
+	if	(isNilNode() == false)
 	{
 		retval.append(")");
 	}
@@ -437,9 +446,9 @@ typename CommonTree<ImplTraits>::StringType	CommonTree<ImplTraits>::toStringTree
 }
 
 template<class ImplTraits>
-typename CommonTree<ImplTraits>::StringType	CommonTree<ImplTraits>::toString()
+typename CommonTree<ImplTraits>::StringType	CommonTree<ImplTraits>::toString() const
 {
-	if( this->isNilNode())
+	if( isNilNode())
 		return StringType("nil");
 	return	m_token->getText();
 }

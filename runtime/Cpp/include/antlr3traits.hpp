@@ -203,10 +203,8 @@ public:
  */
 template< class LxrType, 
 	  class PsrType, 
-	  template<class ImplTraits> class UserTraits = CustomTraitsBase
-	  //,
-	  //class TreePsrType = antlr3::Empty
-	  //template<class ImplTraits> class TreePsrType = TreeParser
+	  template<class ImplTraits> class UserTraits = CustomTraitsBase,
+	  class TreePsrType = antlr3::Empty
 	  >
 class Traits : public TraitsBase<UserTraits>
 {
@@ -228,10 +226,10 @@ public:
 	typedef typename TraitsSelector< typename UserTraits<TraitsType>::TokenStreamType,
 					 CommonTokenStream<TraitsType> >::selected TokenStreamType;
 
-	// TreeNodeIntStreamType
+	// TreeNodeIntStreamType (base class for CommonTreeNodeStream)
 	typedef typename TraitsSelector< typename UserTraits<TraitsType>::TreeNodeIntStreamType,
 					  TreeNodeIntStream<TraitsType> >::selected TreeNodeIntStreamType;
-
+	
 	// TreeNodeStreamType
 	typedef typename TraitsSelector< typename UserTraits<TraitsType>::TreeNodeStreamType, 
 					 CommonTreeNodeStream<TraitsType> >::selected TreeNodeStreamType;
@@ -321,8 +319,9 @@ public:
 	// BaseTreeParserType
 	typedef typename TraitsSelector< typename UserTraits<TraitsType>::BaseTreeParserType, 
 					 TreeParser<TraitsType> >::selected BaseTreeParserType;
-	//typedef TreePsrType<Traits> TreeParserType;
-	typedef BaseTreeParserType TreeParserType;
+	// a "real" TreeParserType (the default value for TreePsrType is empty use BaseTreeParserType is this case)
+	typedef typename TraitsSelector< TreePsrType,
+					 BaseTreeParserType>::selected TreeParserType;
 
 	// RewriteStreamType
 	template<class ElementType>

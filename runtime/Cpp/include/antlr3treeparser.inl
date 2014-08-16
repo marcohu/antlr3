@@ -7,7 +7,7 @@ TreeParser<ImplTraits>::TreeParser( ANTLR_UINT32 sizeHint, TreeNodeStreamType* c
 {
 	/* Install the tree node stream
 	*/
-	this->setTreeNodeStream(ctnstream);
+	setTreeNodeStream(ctnstream);
 
 }
 
@@ -42,6 +42,12 @@ typename TreeParser<ImplTraits>::RecognizerType* TreeParser<ImplTraits>::get_rec
 }
 
 template< class ImplTraits >
+typename TreeParser<ImplTraits>::RecognizerType const* TreeParser<ImplTraits>::get_rec() const
+{
+	return this;
+}
+
+template< class ImplTraits >
 void TreeParser<ImplTraits>::fillExceptionData( ExceptionBaseType* ex )
 {
 	auto xxx = m_ctnstream->LT(1);
@@ -53,23 +59,20 @@ void TreeParser<ImplTraits>::fillExceptionData( ExceptionBaseType* ex )
 	// Are you ready for this? Deep breath now...
 	//
 	{
-		TreeTypePtr tnode;
-
-		tnode		= ex->get_token();
-
-		if	(tnode->get_token()    == NULL)
+		auto tnode = ex->get_token();
+		if (tnode->get_token() == NULL)
 		{
 			ex->set_streamName("-unknown source-" );
 		}
 		else
 		{
-			if	( tnode->get_token()->get_input() == NULL)
+			if ( tnode->get_token()->get_input() == NULL)
 			{
 				ex->set_streamName("");
 			}
 			else
 			{
-				ex->set_streamName(	tnode->get_token()->get_input()->get_fileName() );
+				ex->set_streamName( tnode->get_token()->get_input()->get_fileName() );
 			}
 		}
 		ex->set_message("Unexpected node");
@@ -97,30 +100,16 @@ void TreeParser<ImplTraits>::displayRecognitionError( ANTLR_UINT8** tokenNames, 
 	{
 		errtext << ex->get_streamName() << "(";
 	}
-
 	// Next comes the line number
-	//
-	errtext << this->get_rec()->get_state()->get_exception()->get_line() << ") ";
-	errtext << " : error " << this->get_rec()->get_state()->get_exception()->getType()
-							<< " : "
-							<< this->get_rec()->get_state()->get_exception()->get_message();
+	errtext << get_psrstate()->get_exception()->get_line() << ") ";
 
-	IntStreamType* is			= this->get_istream();
-	TreeTypePtr theBaseTree	= this->get_rec()->get_state()->get_exception()->get_token();
-	StringType ttext		= theBaseTree->toStringTree();
+	errtext << " : error " << get_psrstate()->get_exception()->getType()
+			<< " : " << get_psrstate()->get_exception()->get_message();
 
-	if  (theBaseTree != NULL)
-	{
-		TreeTypePtr  theCommonTree	=  static_cast<TreeTypePtr>(theBaseTree);
-		if	(theCommonTree != NULL)
-		{
-			CommonTokenType* theToken	= theBaseTree->getToken();
-		}
-		errtext << ", at offset "
-			    << theBaseTree->getCharPositionInLine();
-		errtext << ", near " << ttext;
-	}
-	ex->displayRecognitionError( errtext );
+	errtext << ", at offset " << get_psrstate()->get_exception()->get_token()->get_charPositionInLine()
+			<< ", near " << get_psrstate()->get_exception()->get_token()->toStringTree();
+
+	ex->displayRecognitionError( tokenNames, errtext );
 	ImplTraits::displayRecognitionError( errtext.str() );
 }
 
@@ -147,7 +136,7 @@ void TreeParser<ImplTraits>::exConstruct()
 template< class ImplTraits >
 void TreeParser<ImplTraits>::mismatch(ANTLR_UINT32 ttype, BitsetListType* follow)
 {
-	this->exConstruct();
+	exConstruct();
     this->recoverFromMismatchedToken(ttype, follow);
 }
 
@@ -161,7 +150,7 @@ TreeParser<ImplTraits>::getMissingSymbol( IntStreamType* istream, ExceptionBaseT
 	TreeTypePtr				current;
 	CommonTokenType*		token;
 	StringType				text;
-        ANTLR_INT32             i;
+	ANTLR_INT32             i;
 
 	// Dereference the standard pointers
 	//
@@ -195,5 +184,66 @@ TreeParser<ImplTraits>::getMissingSymbol( IntStreamType* istream, ExceptionBaseT
 	return	node;
 }
 
+template<class ImplTraits>
+typename TreeParser<ImplTraits>::RecognizerSharedStateType*
+TreeParser<ImplTraits>::get_psrstate() const
+{
+	return get_rec()->get_state();
+}
+
+template<class ImplTraits>
+bool
+TreeParser<ImplTraits>::hasException() const
+{
+    return get_psrstate()->get_error();
+}
+
+template< class ImplTraits>
+const typename TreeParser<ImplTraits>::CommonTokenType*
+TreeParser<ImplTraits>::matchToken( ANTLR_UINT32 ttype, BitsetListType* follow )
+{
+	return this->get_rec()->match( ttype, follow );
+}
+
+template< class ImplTraits>
+ANTLR_INLINE void
+TreeParser<ImplTraits>::consume()
+{
+	this->get_istream()->consume();
+}
+
+template<class ImplTraits>
+void
+TreeParser<ImplTraits>::followPush(const BitsetListType& follow)
+{
+	get_psrstate()->get_following().push(follow);
+}
+
+template<class ImplTraits>
+void
+TreeParser<ImplTraits>::followPop()
+{
+	get_psrstate()->get_following().pop();
+}
+
+template<class ImplTraits>
+void
+TreeParser<ImplTraits>::precover()
+{
+	return this->get_rec()->recover();
+}
+
+template<class ImplTraits>
+void
+TreeParser<ImplTraits>::preporterror()
+{
+	return get_rec()->reportError();
+}
+template<class ImplTraits>
+ANTLR_UINT32
+TreeParser<ImplTraits>::LA(ANTLR_INT32 i)
+{
+	return this->get_istream()->LA(i);
+}
 
 }

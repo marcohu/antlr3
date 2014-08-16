@@ -1547,7 +1547,6 @@ void	TokenIntStream<ImplTraits>::seek(ANTLR_MARKER index)
     cts->set_p( static_cast<ANTLR_INT32>(index) );
 }
 
-
 /// Return a string that represents the name assoicated with the input source
 ///
 /// /param[in] is The ANTLR3_INT_STREAM interface that is representing this token stream.
@@ -1567,8 +1566,9 @@ TokenIntStream<ImplTraits>::getSourceName()
 	return this->get_super()->get_tokenSource()->get_fileName();
 }
 
+#if 0
 template<class ImplTraits>
-void  TreeNodeIntStream<ImplTraits>::consume()
+void TreeNodeIntStream<ImplTraits>::consume()
 {
 	TreeNodeStreamType* ctns = this->get_super();
 	if( ctns->get_p() == -1 )
@@ -1576,7 +1576,7 @@ void  TreeNodeIntStream<ImplTraits>::consume()
 	ctns->inc_p();
 }
 template<class ImplTraits>
-ANTLR_MARKER		TreeNodeIntStream<ImplTraits>::tindex()
+ANTLR_MARKER TreeNodeIntStream<ImplTraits>::tindex()
 {
 	TreeNodeStreamType* ctns = this->get_super();
 	return (ANTLR_MARKER)(ctns->get_p());
@@ -1602,7 +1602,7 @@ ANTLR_UINT32 TreeNodeIntStream<ImplTraits>::LA(ANTLR_INT32 i)
 }
 
 template<class ImplTraits>
-ANTLR_MARKER	TreeNodeIntStream<ImplTraits>::mark()
+ANTLR_MARKER TreeNodeIntStream<ImplTraits>::mark()
 {
 	TreeNodeStreamType* ctns	    = this->get_super();
 	
@@ -1656,6 +1656,123 @@ ANTLR_UINT32	TreeNodeIntStream<ImplTraits>::size()
 
 	return ctns->get_nodes().size();
 }
+#endif
 
+template<class ImplTraits>
+typename TreeNodeIntStream<ImplTraits>::TreeType* TreeNodeIntStream<ImplTraits>::LT(ANTLR_INT32 k)
+{
+	if (m_p == -1)
+	{
+		get_super()->syncAhead(k);
+	}
+
+	if (k < 0)
+	{
+		return LB(-k);
+	}
+	else if	(k == 0)
+	{
+		return	m_INVALID_NODE;
+	}
+	get_super()->syncAhead(k);
+
+	// k was a legitimate request,
+	//
+	if ((m_p + k - 1) >= get_super()->size())
+	{
+		return m_EOF_NODE;
+	}
+
+	return get(m_p + k - 1);
+}
+
+template<class ImplTraits>
+typename TreeNodeIntStream<ImplTraits>::TreeType* TreeNodeIntStream<ImplTraits>::LB(ANTLR_INT32 k)
+{
+	if (k == 0)
+	{
+		return	m_INVALID_NODE;
+	}
+
+	if ((m_p - k) < 0)
+	{
+		return	m_INVALID_NODE;
+	}
+
+	return get(m_p - k);
+}
+
+
+/// Reset the input stream to the start of the input nodes.
+///
+template<class ImplTraits>
+void
+TreeNodeIntStream<ImplTraits>::reset()
+{
+	clear();
+	m_lastMarker = 0;
+
+	//currentElementIndex = 0;
+    //p = 0;
+    //prevElement = null;
+}
+
+template<class ImplTraits>
+void
+TreeNodeIntStream<ImplTraits>::clear()
+{
+	if (m_p != -1)
+	{
+		m_p	= 0;
+	}
+	m_nodes.clear();
+}
+
+template<class ImplTraits>
+typename TreeNodeIntStream<ImplTraits>::NodesType::size_type
+TreeNodeIntStream<ImplTraits>::size() const
+{
+	return m_nodes.size();
+}
+
+template<class ImplTraits>
+ANTLR_MARKER
+TreeNodeIntStream<ImplTraits>::index() const
+{
+	return (ANTLR_MARKER) m_p;
+}
+
+template<class ImplTraits>
+typename TreeNodeIntStream<ImplTraits>::NodesType::reference
+TreeNodeIntStream<ImplTraits>::get(ANTLR_INT32 i)
+{
+	if (m_p == -1)
+	{
+		get_super()->syncAhead(m_p + i);
+	}
+	return m_nodes.at(i);
+}
+
+template<class ImplTraits>
+typename TreeNodeIntStream<ImplTraits>::SuperType*
+TreeNodeIntStream<ImplTraits>::get_super()
+{
+	return static_cast<SuperType*>(this);
+}
+
+template<class ImplTraits>
+void
+antlr3::TreeNodeIntStream<ImplTraits>::consume()
+{
+	get_super()->syncAhead(1);
+    m_p++;
+}
+
+template<class ImplTraits>
+typename TreeNodeIntStream<ImplTraits>::SuperType const*
+TreeNodeIntStream<ImplTraits>::get_super() const
+{
+	return static_cast<SuperType*>(this);
+}
 
 }

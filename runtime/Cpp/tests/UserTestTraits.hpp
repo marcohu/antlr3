@@ -35,6 +35,10 @@ namespace Antlr3Test {
 
 	class t039labelsLexer;
 	class t039labelsParser;
+
+	class t047treeparserLexer;
+	class t047treeparserParser;
+	class t047treeparserWalker;
 };
 
 namespace Antlr3Test {
@@ -76,6 +80,10 @@ namespace Antlr3Test {
 
 	typedef antlr3::Traits<t039labelsLexer, t039labelsParser, UserTraits> t039labelsLexerTraits;
 	typedef t039labelsLexerTraits t039labelsParserTraits;
+
+	typedef antlr3::Traits<t047treeparserLexer, t047treeparserParser, UserTraits> t047treeparserLexerTraits;
+	typedef t047treeparserLexerTraits t047treeparserParserTraits;
+	typedef antlr3::Traits<t047treeparserLexer, t047treeparserParser, UserTraits, t047treeparserWalker> t047treeparserWalkerTraits;
 
 	inline std::string slurp(std::string const& fileName)
 	{

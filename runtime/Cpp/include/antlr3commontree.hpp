@@ -87,6 +87,8 @@ public:
 	const CommonTokenType* get_token() const;
 	void set_token(CommonTokenType const*);
 
+	ANTLR_UINT32 get_type() const;
+
 	ChildrenType& get_children();
 	const ChildrenType& get_children() const;
 	ANTLR_INT32	get_childIndex() const;
@@ -129,10 +131,10 @@ public:
 	TreeTypePtr&	getFirstChildWithType(ANTLR_UINT32 type);
 
 	StringType	getText();
-	bool	isNilNode();
+	bool	isNilNode() const;
 	void	setChild(ANTLR_UINT32 i, TreeTypePtr child);
-	StringType	toStringTree();
-	StringType	toString();
+	StringType	toStringTree() const;
+	StringType	toString() const;
 	void	freshenParentAndChildIndexes();
 	void	freshenParentAndChildIndexes(ANTLR_UINT32 offset);
 	void	freshenParentAndChildIndexesDeeply();

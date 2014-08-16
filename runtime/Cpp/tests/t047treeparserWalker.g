@@ -2,11 +2,12 @@ tree grammar t047treeparserWalker;
 options {
     language=Cpp;
     tokenVocab=t047treeparser;
-    ASTLabelType=CommonTree;
+    //ASTLabelType=CommonTree;
 }
 
 @includes {
 #include "UserTestTraits.hpp"
+#include "t047treeparserParser.hpp"
 }
 @namespace
 { Antlr3Test }
@@ -21,7 +22,7 @@ declaration
     |   ^(FUNC_DEF functionHeader block)
     ;
 
-variable returns [res]
+variable returns [t047treeparserWalker::StringType res]
     :   ^(VAR_DEF type declarator)
         { 
             $res = $declarator.text; 
@@ -60,10 +61,10 @@ forStat
     :   ^('for' expr expr expr block)
     ;
 
-expr:   ^(EQEQ expr expr)
-    |   ^(LT expr expr)
-    |   ^(PLUS expr expr)
-    |   ^(EQ ID expr)
+expr:   ^(T_EQEQ expr expr)
+    |   ^(T_LT expr expr)
+    |   ^(T_PLUS expr expr)
+    |   ^(T_EQ ID expr)
     |   atom
     ;
 
