@@ -23,6 +23,7 @@ tokens {
 @parser::includes {
 #include "UserTestTraits.hpp"
 #include "t047treeparserLexer.hpp"
+#include "t047treeparserWalker.hpp"
 }
 @parser::namespace
 { Antlr3Test }
@@ -102,10 +103,10 @@ atom
     | '(' expr ')' -> expr
     ; 
 
-FOR : 'for' ;
-INT_TYPE : 'int' ;
-CHAR: 'char';
-VOID: 'void';
+KW_FOR : 'for' ;
+KW_INT_TYPE : 'int' ;
+KW_CHAR: 'char';
+KW_VOID: 'void';
 
 ID  :   ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
     ;

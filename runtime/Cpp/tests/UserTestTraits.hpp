@@ -81,10 +81,10 @@ namespace Antlr3Test {
 	typedef antlr3::Traits<t039labelsLexer, t039labelsParser, UserTraits> t039labelsLexerTraits;
 	typedef t039labelsLexerTraits t039labelsParserTraits;
 
-	typedef antlr3::Traits<t047treeparserLexer, t047treeparserParser, UserTraits> t047treeparserLexerTraits;
+	typedef antlr3::Traits<t047treeparserLexer, t047treeparserParser, UserTraits, t047treeparserWalker> t047treeparserLexerTraits;
 	typedef t047treeparserLexerTraits t047treeparserParserTraits;
-	typedef antlr3::Traits<t047treeparserLexer, t047treeparserParser, UserTraits, t047treeparserWalker> t047treeparserWalkerTraits;
-
+	typedef t047treeparserLexerTraits t047treeparserWalkerTraits;
+	
 	inline std::string slurp(std::string const& fileName)
 	{
 		std::ifstream ifs(fileName.c_str(), std::ios::in | std::ios::binary | std::ios::ate);

@@ -26,6 +26,7 @@ variable returns [t047treeparserWalker::StringType res]
     :   ^(VAR_DEF type declarator)
         { 
             $res = $declarator.text; 
+            std::cout << "Variable: " << $res << std::endl;
         }
     ;
 
