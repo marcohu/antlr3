@@ -142,46 +142,18 @@ void TreeParser<ImplTraits>::mismatch(ANTLR_UINT32 ttype, BitsetListType* follow
 
 template< class ImplTraits >
 typename TreeParser<ImplTraits>::TokenType*
-TreeParser<ImplTraits>::getMissingSymbol( IntStreamType* istream, ExceptionBaseType*		e,
-					  ANTLR_UINT32	 expectedTokenType, BitsetListType*	follow)
+TreeParser<ImplTraits>::getMissingSymbol( IntStreamType* istream, ExceptionBaseType *e, ANTLR_UINT32 expectedTokenType, BitsetListType*	follow)
 {
-	TreeNodeStreamType*		tns;
-	TreeTypePtr				node;
-	TreeTypePtr				current;
-	CommonTokenType*		token;
-	StringType				text;
-	ANTLR_INT32             i;
-
-	// Dereference the standard pointers
-	//
-    tns	    = static_cast<TreeNodeStreamType*>(istream);
-
-	// Create a new empty node, by stealing the current one, or the previous one if the current one is EOF
-	//
-	current	= tns->LT(1);
-    i       = -1;
-
-	if	(current == tns->get_EOF_NODE_p())
-	{
-		current = tns->LT(-1);
-        i--;
-	}
-	node	= current->dupNode();
-
-	// Find the newly dupicated token
-	//
-	token	= node->getToken();
-
+	StringType text("<missing ");
+	text.append((const char *)this->get_rec()->get_state()->get_tokenName(expectedTokenType));
+	text.append(">");
 	// Create the token text that shows it has been inserted
 	//
-	token->setText("<missing ");
-	text = token->getText();
-	text.append((const char *)this->get_rec()->get_state()->get_tokenName(expectedTokenType));
-	text.append((const char *)">");
-
+	TreeTypePtr node = e->get_input()->getTreeAdaptor()->create(expectedTokenType, text.c_str());
 	// Finally return the pointer to our new node
 	//
-	return	node;
+	// TODO return node;
+	return	node.get();
 }
 
 template<class ImplTraits>
@@ -202,7 +174,7 @@ template< class ImplTraits>
 const typename TreeParser<ImplTraits>::CommonTokenType*
 TreeParser<ImplTraits>::matchToken( ANTLR_UINT32 ttype, BitsetListType* follow )
 {
-	return this->get_rec()->match( ttype, follow );
+	return get_rec()->match(ttype, follow)->get_token();
 }
 
 template< class ImplTraits>
@@ -244,6 +216,12 @@ ANTLR_UINT32
 TreeParser<ImplTraits>::LA(ANTLR_INT32 i)
 {
 	return this->get_istream()->LA(i);
+}
+
+template< class ImplTraits>
+void TreeParser<ImplTraits>::set_perror_recovery( bool val )
+{
+	this->get_psrstate()->set_errorRecovery(val);
 }
 
 }

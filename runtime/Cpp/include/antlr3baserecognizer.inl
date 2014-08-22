@@ -788,12 +788,13 @@ BaseRecognizer<ImplTraits, StreamType>::getCurrentInputSymbol(IntStreamType* ist
 
 
 template< class ImplTraits, class StreamType >
-typename BaseRecognizer<ImplTraits, StreamType>::UnitType*	BaseRecognizer<ImplTraits, StreamType>::getMissingSymbol( IntStreamType* istream,
+typename BaseRecognizer<ImplTraits, StreamType>::UnitType*	
+BaseRecognizer<ImplTraits, StreamType>::getMissingSymbol( IntStreamType* istream,
 										  ExceptionBaseType*		e,
 										  ANTLR_UINT32			expectedTokenType,
 										  BitsetListType*	follow)
 {
-	return this->get_super()->getMissingSymbol( istream, e, expectedTokenType, follow );
+	return this->get_super()->getMissingSymbol(static_cast<typename SuperType::IntStreamType*>(istream), e, expectedTokenType, follow);
 }
 
 

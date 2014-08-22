@@ -1702,6 +1702,18 @@ typename TreeNodeIntStream<ImplTraits>::TreeType* TreeNodeIntStream<ImplTraits>:
 	return get(m_p - k);
 }
 
+template<class ImplTraits>
+ANTLR_UINT32 TreeNodeIntStream<ImplTraits>::LA(ANTLR_INT32 k)
+{
+	return get_super()->LA(k);
+}
+
+template<class ImplTraits>
+typename TreeNodeIntStream<ImplTraits>::TreeAdaptorType*
+TreeNodeIntStream<ImplTraits>::getTreeAdaptor()
+{
+	return get_super()->getTreeAdaptor();
+}
 
 /// Reset the input stream to the start of the input nodes.
 ///

@@ -187,6 +187,12 @@ bool	CommonTreeAdaptor<ImplTraits>::isNilNode( TreeTypePtr& t)
 }
 
 template<class ImplTraits>
+bool	CommonTreeAdaptor<ImplTraits>::isNilNode( TreeType* t)
+{
+	return t->isNilNode();
+}
+
+template<class ImplTraits>
 typename CommonTreeAdaptor<ImplTraits>::TreeTypePtr
 CommonTreeAdaptor<ImplTraits>::becomeRoot( TreeTypePtr& newRootTree, TreeTypePtr& oldRootTree)
 {

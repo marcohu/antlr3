@@ -380,6 +380,7 @@ public:
 	typedef typename ImplTraits::TreeType TreeType;
 	typedef typename ImplTraits::TreeTypePtr TreeTypePtr;
 	typedef typename ImplTraits::CommonTokenType CommonTokenType;
+	typedef typename ImplTraits::TreeAdaptorType TreeAdaptorType;
 	typedef typename ImplTraits::AllocPolicyType AllocPolicyType;
 	typedef typename AllocPolicyType::template VectorType<TreeType*> NodesType;
 	typedef typename NodesType::value_type ElementType;
@@ -388,6 +389,9 @@ public:
 	void consume();
 	TreeType* LT(ANTLR_INT32 i);
 	TreeType* LB(ANTLR_INT32 i);
+	ANTLR_UINT32 LA( ANTLR_INT32 la );
+	TreeAdaptorType* getTreeAdaptor();
+
 	void seek(ANTLR_MARKER index);
 	ANTLR_MARKER mark();
 	ANTLR_MARKER index() const;
