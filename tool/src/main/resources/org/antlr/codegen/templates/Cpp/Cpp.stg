@@ -2460,7 +2460,7 @@ ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
 (this->get_strstream()->toString(<scope>.start, <scope>.start))
 <else>
-(this->get_strstream()->toStringTT(<scope>.start, <scope>.stop))
+(this->get_strstream()->toString(<scope>.start, <scope>.stop))
 <endif>
 >>
 
@@ -2482,9 +2482,9 @@ rulePropertyRef_stop(scope,attr) ::= "retval.stop"
 rulePropertyRef_tree(scope,attr) ::= "retval.tree"
 rulePropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-this->get_input()->toStringSS( this->get_adaptor()->getTokenStartIndex(retval.start), this->get_adaptor()->getTokenStopIndex(retval.start))
+this->get_input()->toString( this->get_adaptor()->getTokenStartIndex(retval.start), this->get_adaptor()->getTokenStopIndex(retval.start))
 <else>
-this->get_strstream()->toStringTT(retval.start, this->LT(-1))
+this->get_strstream()->toString(retval.start, this->LT(-1))
 <endif>
 >>
 rulePropertyRef_st(scope,attr) ::= "retval.st"

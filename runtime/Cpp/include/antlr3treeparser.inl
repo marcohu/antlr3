@@ -114,7 +114,8 @@ void TreeParser<ImplTraits>::displayRecognitionError( ANTLR_UINT8** tokenNames, 
 }
 
 template< class ImplTraits >
-void	TreeParser<ImplTraits>::setTreeNodeStream(TreeNodeStreamType* input)
+void
+TreeParser<ImplTraits>::setTreeNodeStream(TreeNodeStreamType* input)
 {
 	m_ctnstream = input;
     this->get_rec()->reset();
@@ -122,7 +123,8 @@ void	TreeParser<ImplTraits>::setTreeNodeStream(TreeNodeStreamType* input)
 }
 
 template< class ImplTraits >
-typename TreeParser<ImplTraits>::TreeNodeStreamType* TreeParser<ImplTraits>::getTreeNodeStream()
+typename TreeParser<ImplTraits>::TreeNodeStreamType*
+TreeParser<ImplTraits>::getTreeNodeStream()
 {
 	return m_ctnstream;
 }
@@ -219,9 +221,17 @@ TreeParser<ImplTraits>::LA(ANTLR_INT32 i)
 }
 
 template< class ImplTraits>
-void TreeParser<ImplTraits>::set_perror_recovery( bool val )
+void
+TreeParser<ImplTraits>::set_perror_recovery( bool val )
 {
 	this->get_psrstate()->set_errorRecovery(val);
+}
+
+template<class ImplTraits>
+typename TreeParser<ImplTraits>::TokenStreamType*
+TreeParser<ImplTraits>::get_strstream() const
+{
+	return m_ctnstream;
 }
 
 }
