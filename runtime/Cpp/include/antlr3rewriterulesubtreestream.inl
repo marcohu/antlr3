@@ -214,7 +214,6 @@ typename RewriteRuleSubtreeStream<ImplTraits>::TreeTypePtr
 RewriteRuleSubtreeStream<ImplTraits>::nextNode()
 {
 	//System.out.println("nextNode: elements="+elements+", singleElement="+((Tree)singleElement).toStringTree());
-	ANTLR_UINT32 n = this->size();
 	if (m_dirty || (m_cursor == m_elements.end() && m_elements.size() == 1)) {
 		// if out of elements and size is 1, dup (at most a single node
 		// since this is for making root nodes).

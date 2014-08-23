@@ -224,7 +224,7 @@ void	CommonTree<ImplTraits>::replaceChildren(ANTLR_INT32 startChildIndex, ANTLR_
 			m_children[ startChildIndex + j ] = newChildrenRef.at(j);
 		}
 
-		ANTLR_UINT32 numToInsert = replacingWithHowMany - replacingHowMany;
+		//ANTLR_UINT32 numToInsert = replacingWithHowMany - replacingHowMany;
 		for	(ANTLR_UINT32 j = replacingHowMany; j < replacingWithHowMany; j++)
 		{
 			m_children.push_back( newChildrenRef.at(j) );
