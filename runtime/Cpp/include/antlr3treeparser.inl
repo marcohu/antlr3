@@ -50,8 +50,7 @@ typename TreeParser<ImplTraits>::RecognizerType const* TreeParser<ImplTraits>::g
 template< class ImplTraits >
 void TreeParser<ImplTraits>::fillExceptionData( ExceptionBaseType* ex )
 {
-	auto xxx = m_ctnstream->LT(1);
-	//ex->set_token( m_ctnstream->LT(1) );	    /* Current input tree node */
+	ex->set_token( m_ctnstream->LT(1) );	    /* Current input tree node */
 	ex->set_line( ex->get_token()->get_line() );
 	ex->set_charPositionInLine( ex->get_token()->get_charPositionInLine() );
 	ex->set_index( m_ctnstream->index() );
@@ -176,7 +175,8 @@ template< class ImplTraits>
 const typename TreeParser<ImplTraits>::CommonTokenType*
 TreeParser<ImplTraits>::matchToken( ANTLR_UINT32 ttype, BitsetListType* follow )
 {
-	return get_rec()->match(ttype, follow)->get_token();
+	auto node = get_rec()->match(ttype, follow);
+	return (node ? node->get_token() : NULL);
 }
 
 template< class ImplTraits>

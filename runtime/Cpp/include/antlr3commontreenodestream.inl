@@ -2,12 +2,18 @@ namespace antlr3 {
 
 template<class ImplTraits>
 CommonTreeNodeStream<ImplTraits>::CommonTreeNodeStream(ANTLR_UINT32 hint)
+	: m_adaptor(new TreeAdaptorType)
+	, m_UP(m_adaptor->create(CommonTokenType::TOKEN_UP, "UP"))
+	, m_DOWN(m_adaptor->create(CommonTokenType::TOKEN_DOWN, "DOWN"))
 {
 	init(hint);
 }
 
 template<class ImplTraits>
 CommonTreeNodeStream<ImplTraits>::CommonTreeNodeStream( TreeTypePtr& tree, ANTLR_UINT32 hint )
+	: m_adaptor(new TreeAdaptorType)
+	, m_UP(m_adaptor->create(CommonTokenType::TOKEN_UP, "UP"))
+	, m_DOWN(m_adaptor->create(CommonTokenType::TOKEN_DOWN, "DOWN"))
 {
 	init(hint);
 	m_root = tree.get();
@@ -17,7 +23,7 @@ template<class ImplTraits>
 void CommonTreeNodeStream<ImplTraits>::init( ANTLR_UINT32 hint )
 {
 	m_root = NULL;
-	m_adaptor = new TreeAdaptorType;
+
 	// Create the node list map
 	//
 	if (hint == 0)
@@ -34,17 +40,18 @@ void CommonTreeNodeStream<ImplTraits>::init( ANTLR_UINT32 hint )
 	m_uniqueNavigationNodes = false;
 	m_isRewriter = false;
 
-	m_UP = m_adaptor->create(CommonTokenType::TOKEN_UP, "UP");
-	m_DOWN = m_adaptor->create(CommonTokenType::TOKEN_DOWN, "DOWN");
+
 	m_EOF_NODE = m_adaptor->create(CommonTokenType::TOKEN_EOF, "EOF");
 	m_INVALID_NODE = m_adaptor->create(CommonTokenType::TOKEN_INVALID, "INVALID");
 }
 
 template<class ImplTraits>
 CommonTreeNodeStream<ImplTraits>::CommonTreeNodeStream( const CommonTreeNodeStream& ctn )
+	: m_adaptor(ctn.m_adaptor)
+	, m_UP(m_adaptor->create(CommonTokenType::TOKEN_UP, "UP"))
+	, m_DOWN(m_adaptor->create(CommonTokenType::TOKEN_DOWN, "DOWN"))
 {
 	m_root = ctn.m_root;
-	m_adaptor = ctn.m_adaptor;
 	m_nodes.reserve( DEFAULT_INITIAL_BUFFER_SIZE );
 	m_nodeStack = ctn.m_nodeStack;
 	m_p = -1;
@@ -58,9 +65,7 @@ CommonTreeNodeStream<ImplTraits>::CommonTreeNodeStream( const CommonTreeNodeStre
 	m_tail = 0;
 	m_uniqueNavigationNodes = false;
 	m_isRewriter = true;
-
-	m_UP = m_adaptor->create(CommonTokenType::TOKEN_UP, "UP");
-	m_DOWN = m_adaptor->create(CommonTokenType::TOKEN_DOWN, "DOWN");
+	
 	m_EOF_NODE = m_adaptor->create(CommonTokenType::TOKEN_EOF, "EOF");
 	m_INVALID_NODE = m_adaptor->create(CommonTokenType::TOKEN_INVALID, "INVALID");
 }
@@ -195,7 +200,7 @@ void CommonTreeNodeStream<ImplTraits>::addNavigationNode(ANTLR_UINT32 ttype)
 		{
 		// 	m_nodes.push_back( this->newDownNode() );
 		} else {
-			m_nodes.push_back( m_DOWN );
+			m_nodes.push_back( m_DOWN.get() );
 		}
 	}
 	else
@@ -204,7 +209,7 @@ void CommonTreeNodeStream<ImplTraits>::addNavigationNode(ANTLR_UINT32 ttype)
 		{
 		// 	m_nodes.push_back( this->newUpNode() );
 		} else {
-			m_nodes.push_back( m_UP );
+			m_nodes.push_back( m_UP.get() );
 		}
 	}
 }

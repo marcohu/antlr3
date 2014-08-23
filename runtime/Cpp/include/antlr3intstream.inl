@@ -1672,7 +1672,7 @@ typename TreeNodeIntStream<ImplTraits>::TreeType* TreeNodeIntStream<ImplTraits>:
 	}
 	else if	(k == 0)
 	{
-		return	m_INVALID_NODE;
+		return	m_INVALID_NODE.get();
 	}
 	get_super()->syncAhead(k);
 
@@ -1680,7 +1680,7 @@ typename TreeNodeIntStream<ImplTraits>::TreeType* TreeNodeIntStream<ImplTraits>:
 	//
 	if ((m_p + k - 1) >= get_super()->size())
 	{
-		return m_EOF_NODE;
+		return m_EOF_NODE.get();
 	}
 
 	return get(m_p + k - 1);
@@ -1691,12 +1691,12 @@ typename TreeNodeIntStream<ImplTraits>::TreeType* TreeNodeIntStream<ImplTraits>:
 {
 	if (k == 0)
 	{
-		return	m_INVALID_NODE;
+		return	m_INVALID_NODE.get();
 	}
 
 	if ((m_p - k) < 0)
 	{
-		return	m_INVALID_NODE;
+		return	m_INVALID_NODE.get();
 	}
 
 	return get(m_p - k);

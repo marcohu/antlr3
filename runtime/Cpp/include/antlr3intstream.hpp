@@ -432,12 +432,12 @@ protected:
 	/** Dummy tree node that indicates the termination point of the
 	 * tree. Initialized by a call to create a new interface.
 	 **/
-	TreeType *m_EOF_NODE;
+	TreeTypePtr m_EOF_NODE;
 
 	/** Dummy node that is returned if we need to indicate an invalid node
 	 * for any reason.
 	 **/
-	TreeType *m_INVALID_NODE;
+	TreeTypePtr m_INVALID_NODE;
 
 	/// The complete mapping from stream index to tree node.
 	/// This buffer includes pointers to DOWN, UP, and EOF nodes.

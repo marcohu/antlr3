@@ -124,15 +124,18 @@ public:
 
 	void syncAhead(int need);
 
-	/** Dummy tree node that indicates a descent into a child
-	 * tree. Initialized by a call to create a new interface.
-	 **/
-	TreeType *m_DOWN;
+	/// Pointer to tree adaptor interface that manipulates/builds the tree.
+	TreeAdaptorType* m_adaptor;
 
 	/** Dummy tree node that indicates a descent up to a parent
 	 * tree. Initialized by a call to create a new interface.
 	 **/
-	TreeType *m_UP;
+	TreeTypePtr m_UP;
+
+	/** Dummy tree node that indicates a descent into a child
+	 * tree. Initialized by a call to create a new interface.
+	 **/
+	TreeTypePtr m_DOWN;
 
 	StringType toString();
 public:
@@ -190,9 +193,6 @@ private:
 
 	/// Which tree are we navigating ?
 	TreeType* m_root;
-
-	/// Pointer to tree adaptor interface that manipulates/builds the tree.
-	TreeAdaptorType* m_adaptor;
 
 	/// As we walk down the nodes, we must track parent nodes so we know
 	/// where to go after walking the last child of a node.  When visiting
