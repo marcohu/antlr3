@@ -52,13 +52,17 @@ int testWalker(string const data)
 		auto r = psr->program();
 		std::cout << r.tree->toStringTree() << std::endl;
 
-		std::cout
-			<< data << std::endl
-			<< "Result:" << std::endl << r.tree->toStringTree() << std::endl
-			<< "Expected:" << std::endl << expectedResult << std::endl
-			<< (r.tree->toStringTree() == expectedResult ? "OK" : "Fail") << std::endl;
+	std::cout
+		<< data << std::endl
+		<< "Result:" << std::endl << r.tree->toStringTree() << std::endl
+		<< "Expected:" << std::endl << expectedResult << std::endl
+		<< (r.tree->toStringTree() == expectedResult ? "OK" : "Fail") << std::endl;
+	
+	auto nodes = new t047treeparserWalker::TreeNodeStreamType(r.tree);
 
-		auto nodes = new t047treeparserWalker::TreeNodeStreamType(r.tree);
+        // nodes.setTokenStream(tStream)
+	auto walker = new t047treeparserWalker(nodes);
+	walker->program();
 
 		// nodes.setTokenStream(tStream)
 		auto walker = new t047treeparserWalker(nodes);
