@@ -179,7 +179,7 @@ protected:
 	 * null or "" too, but users should not access $ruleLabel.text in
 	 * an action of course in that case.
 	 **/
-	void toStringImpl(TreeTypePtr& start, TreeTypePtr& stop, StringStreamType& buf);
+	void toStringImpl(TreeType* start, TreeType* stop, StringStreamType& buf);
 	
 	TreeTypePtr newDownNode();
 	TreeTypePtr newUpNode();

@@ -50,7 +50,7 @@ typename TreeParser<ImplTraits>::RecognizerType const* TreeParser<ImplTraits>::g
 template< class ImplTraits >
 void TreeParser<ImplTraits>::fillExceptionData( ExceptionBaseType* ex )
 {
-	ex->set_token( m_ctnstream->LT(1) );	    /* Current input tree node */
+	ex->set_token(new TokenType(m_ctnstream->LT(1)));	    /* The "clone" of the Current input tree node */
 	ex->set_line( ex->get_token()->get_line() );
 	ex->set_charPositionInLine( ex->get_token()->get_charPositionInLine() );
 	ex->set_index( m_ctnstream->index() );
@@ -149,12 +149,18 @@ TreeParser<ImplTraits>::getMissingSymbol( IntStreamType* istream, ExceptionBaseT
 	text.append((const char *)this->get_rec()->get_state()->get_tokenName(expectedTokenType));
 	text.append(">");
 	// Create the token text that shows it has been inserted
+	// this token is NOT yet owner by anybody
 	//
-	TreeTypePtr node = e->get_input()->getTreeAdaptor()->create(expectedTokenType, text.c_str());
+	CommonTokenType* token = new CommonTokenType();
+	token->set_tokText( text );
+	token->set_type(expectedTokenType);
+
+	TreeType *node = new TreeType(token);
+
+	//TreeTypePtr node = e->get_input()->getTreeAdaptor()->create(expectedTokenType, text.c_str());
+
 	// Finally return the pointer to our new node
-	//
-	// TODO return node;
-	return	node.get();
+	return	node;
 }
 
 template<class ImplTraits>

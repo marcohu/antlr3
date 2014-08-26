@@ -137,12 +137,12 @@ template<class ImplTraits>
 typename CommonTreeNodeStream<ImplTraits>::StringType CommonTreeNodeStream<ImplTraits>::toString(TreeTypePtr& start, TreeTypePtr& stop)
 {
 	StringStreamType buf;
-	toStringImpl(start, stop, buf);
+	toStringImpl(start.get(), stop.get(), buf);
 	return buf.str();
 }
 
 template<class ImplTraits>
-void CommonTreeNodeStream<ImplTraits>::toStringImpl(TreeTypePtr& start, TreeTypePtr& stop, StringStreamType &buf)
+void CommonTreeNodeStream<ImplTraits>::toStringImpl(TreeType* start, TreeType* stop, StringStreamType &buf)
 {
 	if (!start->isNilNode() )
 	{
@@ -171,7 +171,7 @@ void CommonTreeNodeStream<ImplTraits>::toStringImpl(TreeTypePtr& start, TreeType
 
 	for (auto &child: start->get_children())
 	{
-		this->toStringImpl(child, stop, buf);
+		this->toStringImpl(child.get(), stop, buf);
 	}
 
 	if (!children.empty() && ! start->isNilNode() )
@@ -274,7 +274,8 @@ template<class ImplTraits>
 void
 CommonTreeNodeStream<ImplTraits>::syncAhead(int need)
 {
-	fillBufferRoot();
+	if (m_p == -1)
+		fillBufferRoot();
 }
 
 template<class ImplTraits>

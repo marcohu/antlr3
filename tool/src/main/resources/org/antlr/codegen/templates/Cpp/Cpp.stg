@@ -2333,12 +2333,15 @@ public:
 struct <ruleDescriptor:returnStructName()>
 {
 public:
-    <recognizer.ASTLabelType>       start;
-    <recognizer.ASTLabelType>       stop;
+    <recognizer.ASTLabelType>::pointer       start;
+    <recognizer.ASTLabelType>::pointer       stop;
+    <componentBaseType()>*                   parser;
 	<ruleDescriptor:returnStructName()>()
+	: parser()
 	{
 	}
-	<ruleDescriptor:returnStructName()>( <componentBaseType()>* parser)
+	<ruleDescriptor:returnStructName()>( <componentBaseType()>* psr)
+	: parser(psr)
 	{
 	}
     <ruleDescriptor:returnStructName()>( <ruleDescriptor:returnStructName()>&& other )
@@ -2346,15 +2349,15 @@ public:
     <scope.attributes:{it | <it.name>(other.<it.name>) }; separator=",">
     <endif>
     {
-     	start = std::move(other.start);
-     	stop  = std::move(other.stop);
+     	start = other.start;
+     	stop  = other.stop;
     }
     
     <ruleDescriptor:returnStructName()>&
     operator=( <ruleDescriptor:returnStructName()>&& other )
     {
-     	start = std::move(other.start);
-     	stop  = std::move(other.stop);
+     	start = other.start;
+     	stop  = other.stop;
 
     	<scope.attributes:{it | <it.name> = other.<it.name>; }; separator="\n">
     	return *this;
