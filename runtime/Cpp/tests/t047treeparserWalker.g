@@ -3,6 +3,9 @@ options {
     language=Cpp;
     tokenVocab=t047treeparser;
     //ASTLabelType=CommonTree;
+	//output = AST;
+    filter=true;
+    backtrack=true;
 }
 
 @includes {
@@ -12,34 +15,8 @@ options {
 @namespace
 { Antlr3Test }
 
-program
-    :   declaration+
-    ;
-
-declaration
-    :   variable
-    |   ^(FUNC_DECL functionHeader)
-    |   ^(FUNC_DEF functionHeader block)
-    ;
-
-variable returns [t047treeparserWalker::StringType res]
-    :   ^(VAR_DEF type declarator)
-        { 
-            $res = $declarator.text; 
-            std::cout << "Variable: " << $res << std::endl;
-        }
-    ;
-
 declarator
     :   ID 
-    ;
-
-functionHeader
-    :   ^(FUNC_HDR type ID formalParameter+)
-    ;
-
-formalParameter
-    :   ^(ARG_DEF type declarator)
     ;
 
 type
@@ -49,27 +26,36 @@ type
     |   ID        
     ;
 
-block
-    :   ^(BLOCK variable* stat*)
+topdown
+    :   enterBlock
+    |   varDeclaration
     ;
 
-stat: forStat
-    | expr
-    | block
+bottomup
+    :   exitBlock
+    |   varDeclaration        
     ;
 
-forStat
-    :   ^('for' expr expr expr block)
-    ;
+// D e f i n e  s y m b o l s
 
-expr:   ^(T_EQEQ expr expr)
-    |   ^(T_LT expr expr)
-    |   ^(T_PLUS expr expr)
-    |   ^(T_EQ ID expr)
-    |   atom
+// START: var
+varDeclaration // global, parameter, or local variable
+    :   ^(VAR_DEF type declarator)
+        {
+            std::cout << "def " << $declarator.text << std::endl;
+        }
     ;
+// END: var
 
-atom
-    : ID      
-    | INT      
-    ; 
+// START: block
+enterBlock
+    :   BLOCK { /*currentScope = new LocalScope(currentScope); */ }// push scope
+    ;
+exitBlock
+    :   BLOCK
+        {
+                    //System.out.println("locals: "+currentScope);
+                    //currentScope = currentScope.getEnclosingScope();    // pop scope
+        }
+    ;
+// END: block

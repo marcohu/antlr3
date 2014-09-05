@@ -181,13 +181,13 @@ CommonTreeAdaptor<ImplTraits>::errorNode( CommonTokenType*,
 }
 
 template<class ImplTraits>
-bool	CommonTreeAdaptor<ImplTraits>::isNilNode( TreeTypePtr& t)
+bool	CommonTreeAdaptor<ImplTraits>::isNilNode( TreeTypePtr const& t)
 {
 	return t->isNilNode();
 }
 
 template<class ImplTraits>
-bool	CommonTreeAdaptor<ImplTraits>::isNilNode( TreeType* t)
+bool	CommonTreeAdaptor<ImplTraits>::isNilNode( TreeType const* t)
 {
 	return t->isNilNode();
 }
@@ -413,8 +413,16 @@ typename CommonTreeAdaptor<ImplTraits>::StringType CommonTreeAdaptor<ImplTraits>
 template<class ImplTraits>
 typename CommonTreeAdaptor<ImplTraits>::TreeTypePtr& CommonTreeAdaptor<ImplTraits>::getChild( TreeTypePtr& t, ANTLR_UINT32 i)
 {
-	if ( t==NULL )
-		return NULL;
+	//if ( t==NULL )
+	//	return NULL;
+	return t->getChild(i);
+}
+
+template<class ImplTraits>
+typename CommonTreeAdaptor<ImplTraits>::TreeTypePtr& CommonTreeAdaptor<ImplTraits>::getChild( TreeType* t, ANTLR_UINT32 i)
+{
+	//if ( t==NULL )
+	//	return NULL;
 	return t->getChild(i);
 }
 
@@ -446,7 +454,15 @@ ANTLR_INT32	CommonTreeAdaptor<ImplTraits>::getChildIndex( TreeTypePtr& t)
 }
 
 template<class ImplTraits>
-ANTLR_UINT32	CommonTreeAdaptor<ImplTraits>::getChildCount( TreeTypePtr& t)
+ANTLR_UINT32	CommonTreeAdaptor<ImplTraits>::getChildCount( TreeTypePtr const& t) const
+{
+	if ( t==NULL )
+		return 0;
+	return t->getChildCount();
+}
+
+template<class ImplTraits>
+ANTLR_UINT32	CommonTreeAdaptor<ImplTraits>::getChildCount( TreeType const* t) const
 {
 	if ( t==NULL )
 		return 0;

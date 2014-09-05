@@ -226,6 +226,9 @@ class CommonTreeAdaptor;
 template<class ImplTraits>
 class TreeParser;
 
+template<class ImplTraits>
+class TreeFilter;
+
 /// Pointer to an instantiation of 'class' #ANTLR3_INT_TRIE
 /// \ingroup ANTLR3_INT_TRIE
 ///

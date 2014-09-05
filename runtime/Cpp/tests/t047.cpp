@@ -66,8 +66,11 @@ int testWalker(string const data)
 
 		// nodes.setTokenStream(tStream)
 		auto walker = new t047treeparserWalker(nodes);
-		//walker->program();
-		delete walker;
+		walker->downup(r.tree);
+		//delete walker;
+
+		//auto walker2 = new t047treeparserWalker(nodes);
+		//auto r2 = walker2->variables();
 	}
 	delete lxr;
 	delete input;

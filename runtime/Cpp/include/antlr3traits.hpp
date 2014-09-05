@@ -75,6 +75,7 @@ public:
 	typedef Empty TokenSourceType;
 	typedef Empty BaseParserType;//this should be overridden with generated lexer
 	typedef Empty BaseTreeParserType;
+	typedef Empty BaseTreeFilterType;
 	
 	template<class ElementType>
 	class RewriteStreamType : public Empty
@@ -315,13 +316,16 @@ public:
 					 Parser<TraitsType> >::selected BaseParserType;	
 	typedef PsrType ParserType;
 
-	// this should be overridden with generated treeparser (not implemented yet)
+	// this should be overridden with generated treeparser
 	// BaseTreeParserType
 	typedef typename TraitsSelector< typename UserTraits<TraitsType>::BaseTreeParserType, 
 					 TreeParser<TraitsType> >::selected BaseTreeParserType;
 	// a "real" TreeParserType (the default value for TreePsrType is empty use BaseTreeParserType is this case)
 	typedef typename TraitsSelector< TreePsrType,
 					 BaseTreeParserType>::selected TreeParserType;
+
+	typedef typename TraitsSelector< typename UserTraits<TraitsType>::BaseTreeFilterType,
+					 TreeFilter<TraitsType> >::selected BaseTreeFilterType;
 
 	// RewriteStreamType
 	template<class ElementType>

@@ -1678,7 +1678,7 @@ typename TreeNodeIntStream<ImplTraits>::TreeType* TreeNodeIntStream<ImplTraits>:
 
 	// k was a legitimate request,
 	//
-	if ((m_p + k - 1) >= get_super()->size())
+	if ((size_t)(m_p + k - 1) >= get_super()->size())
 	{
 		return m_EOF_NODE.get();
 	}

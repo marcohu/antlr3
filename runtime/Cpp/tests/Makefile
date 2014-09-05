@@ -32,7 +32,8 @@ $(ANTLR): $(STGS)
 	jar uvf $(ANTLR) \
 	-C ../../../tool/src/main/resources org/antlr/codegen/templates/Cpp/Cpp.stg \
 	-C ../../../tool/src/main/resources org/antlr/codegen/templates/Cpp/AST.stg \
-	-C ../../../tool/src/main/resources org/antlr/codegen/templates/Cpp/ASTParser.stg
+	-C ../../../tool/src/main/resources org/antlr/codegen/templates/Cpp/ASTParser.stg \
+	-C ../../../tool/src/main/resources org/antlr/codegen/templates/Cpp/ASTTreeParser.stg
 
 a001:	a001.cpp a001.tokens ATestTraits.hpp Makefile $(ANTLR) $(RUNTIME_HEADERS)
 	$(CXX) $(CFLAGS) $(INCLUDES) $< $(wildcard $@?*.cpp) -o $@

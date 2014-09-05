@@ -136,8 +136,8 @@ public:
 	TreeType*	getParent( TreeTypePtr& child);
 
 	TreeTypePtr	errorNode( CommonTokenType* tnstream, const CommonTokenType* startToken, const CommonTokenType* stopToken);
-	bool	isNilNode( TreeTypePtr& t);
-  	bool	isNilNode( TreeType* t);
+	bool	isNilNode( TreeTypePtr const& t);
+  	bool	isNilNode( TreeType const* t);
 
 	TreeTypePtr	becomeRoot( TreeTypePtr& newRoot, TreeTypePtr& oldRoot);
 	TreeTypePtr	becomeRoot( TreeTypePtr&& newRoot, TreeTypePtr& oldRoot);
@@ -158,12 +158,14 @@ public:
 	StringType	getText( TreeTypePtr& t);
         
 	TreeTypePtr&	getChild( TreeTypePtr& t, ANTLR_UINT32 i);
+	TreeTypePtr&	getChild( TreeType* t, ANTLR_UINT32 i);
 	void	setChild( TreeTypePtr& t, ANTLR_UINT32 i, TreeTypePtr& child);
 	void	deleteChild( TreeTypePtr& t, ANTLR_UINT32 i);
 	void	setChildIndex( TreeTypePtr& t, ANTLR_INT32 i);
 	ANTLR_INT32	getChildIndex( TreeTypePtr& t);
 	
-	ANTLR_UINT32	getChildCount( TreeTypePtr&);
+	ANTLR_UINT32	getChildCount( TreeTypePtr const&) const;
+	ANTLR_UINT32	getChildCount( TreeType const*) const;
 	ANTLR_UINT64	getUniqueID( TreeTypePtr&);
 
 	CommonTokenType*	getToken( TreeTypePtr& t);

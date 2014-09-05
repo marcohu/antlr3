@@ -491,7 +491,12 @@ componentType() ::= <<
 <name>ImplTraits::LexerType
 <endif>
 <if(TREE_PARSER)>
-<name>ImplTraits::TreeParserType
+<if(recognizer.filterMode)>
+<if(buildAST)><name>ImplTraits::TreeRewriterType
+<else><name>ImplTraits::TreeFilterType
+<endif>
+<else><name>ImplTraits::TreeParserType
+<endif>
 <endif>
 >>
 
@@ -503,7 +508,12 @@ componentBaseType() ::= <%
 <name>ImplTraits::BaseLexerType
 <endif>
 <if(TREE_PARSER)>
-<name>ImplTraits::BaseTreeParserType
+<if(recognizer.filterMode)>
+<if(buildAST)><name>ImplTraits::BaseTreeRewriterType
+<else><name>ImplTraits::BaseTreeFilterType
+<endif>
+<else><name>ImplTraits::BaseTreeParserType
+<endif>
 <endif>
 %>
 
@@ -641,7 +651,7 @@ const char* <name>::getGrammarFileName()
  *     - Fail NULL
  */
 <name>::<name>(StreamType* instream<grammar.delegators:{g|, <g.recognizerName>* <g:delegateName()>}>)
-    :<name>ImplTraits::BaseLexerType(ANTLR_SIZE_HINT, instream, NULL)
+    : <componentBaseType()>(ANTLR_SIZE_HINT, instream, NULL)
 {
 	// See if we can create a new lexer with the standard constructor
 	//
@@ -938,10 +948,10 @@ ANTLR_UINT8**	<name>::getTokenNames()
 
 constructorInitializerType(rec_state) ::=<<
 <if(PARSER)>
-    :ImplTraits::BaseParserType(ANTLR_SIZE_HINT, instream, <rec_state>)
+    : <componentBaseType()>(ANTLR_SIZE_HINT, instream, <rec_state>)
 <endif>
 <if(TREE_PARSER)>
-    :ImplTraits::BaseTreeParserType(ANTLR_SIZE_HINT, instream, <rec_state>)
+    : <componentBaseType()>(ANTLR_SIZE_HINT, instream, <rec_state>)
 <endif>
 >>
 
@@ -978,7 +988,7 @@ treeParser(	grammar,
 			filterMode,
 			labelType={<ASTLabelType>},
 			ASTLabelType="ImplTraits::TreeTypePtr",
-			superClass="TreeParser",
+			superClass={<if(filterMode)><if(buildAST)>TreeRewriter<else>TreeFilter<endif><else>TreeParser<endif>},			
 			members={<actions.treeparser.members>}
 			) ::= <<
 <beginNamespace(actions)>
@@ -2335,18 +2345,16 @@ struct <ruleDescriptor:returnStructName()>
 public:
     <recognizer.ASTLabelType>::pointer       start;
     <recognizer.ASTLabelType>::pointer       stop;
-    <componentBaseType()>*                   parser;
 	<ruleDescriptor:returnStructName()>()
-	: parser()
 	{
 	}
 	<ruleDescriptor:returnStructName()>( <componentBaseType()>* psr)
-	: parser(psr)
 	{
 	}
     <ruleDescriptor:returnStructName()>( <ruleDescriptor:returnStructName()>&& other )
     <if(scope.attributes)>
-    <scope.attributes:{it | <it.name>(other.<it.name>) }; separator=",">
+    <first(scope.attributes):{it | : <it.name>(other.<it.name>) }; separator=",">
+    <rest(scope.attributes):{it | , <it.name>(other.<it.name>) }; separator=",">
     <endif>
     {
      	start = other.start;
