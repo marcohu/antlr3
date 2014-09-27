@@ -154,15 +154,15 @@ public:
 	typedef TreeParser<ImplTraits> BaseType;
 	typedef typename BaseType::RecognizerType BaseRecognizerType;
 	typedef typename ImplTraits::TreeParserType SuperType;
-	using typename BaseType::TreeNodeStreamType;
-	using typename BaseType::RecognizerSharedStateType;
-	using typename BaseType::TreeTypePtr;
-	using typename BaseType::TreeType;
+
+	typedef typename BaseType::TreeNodeStreamType TreeNodeStreamType;
+	typedef typename BaseType::RecognizerSharedStateType RecognizerSharedStateType;
+	typedef typename BaseType::TreeTypePtr TreeTypePtr;
+	typedef typename BaseType::TreeType TreeType;
 
 	typedef typename ImplTraits::TreeAdaptorType TreeAdaptorType;
 
-	TreeFilter( ANTLR_UINT32 sizeHint, TreeNodeStreamType* ctnstream,
-											RecognizerSharedStateType* state);
+	TreeFilter( ANTLR_UINT32 sizeHint, TreeNodeStreamType* ctnstream, RecognizerSharedStateType* state);
 
 	SuperType* get_super();
 
